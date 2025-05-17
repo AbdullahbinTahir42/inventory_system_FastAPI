@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 import model, schemas
 from database import SessionLocal, engine, Base
+from typing import Optional, List
 
 Base.metadata.create_all(bind=engine)  # create tables
 
@@ -15,10 +16,9 @@ def get_db():
     finally:
         db.close()
 
-
 @app.get("/")
 def root():
-    return {"Welcome To our store"}        
+    return {"message": "Welcome To our store"}
 
 # Create item
 @app.post("/items/", response_model=schemas.Item)
@@ -29,10 +29,27 @@ def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
     db.refresh(new_item)
     return new_item
 
-# Get all items
-@app.get("/items/", response_model=list[schemas.Item])
-def get_items(db: Session = Depends(get_db)):
-    return db.query(model.Item).all()
+# Get all items with optional filters
+@app.get("/items/", response_model=List[schemas.Item])
+def get_items(
+    name: Optional[str] = Query(None, description="Filter by item name"),
+    min_price: Optional[float] = Query(None, description="Minimum price"),
+    max_price: Optional[float] = Query(None, description="Maximum price"),
+    min_quantity: Optional[int] = Query(None, description="Minimum quantity"),
+    db: Session = Depends(get_db)
+):
+    query = db.query(model.Item)
+
+    if name:
+        query = query.filter(model.Item.name.ilike(f"%{name}%"))
+    if min_price is not None:
+        query = query.filter(model.Item.price >= min_price)
+    if max_price is not None:
+        query = query.filter(model.Item.price <= max_price)
+    if min_quantity is not None:
+        query = query.filter(model.Item.quantity >= min_quantity)
+
+    return query.all()
 
 # Get item by ID
 @app.get("/items/{item_id}", response_model=schemas.Item)
@@ -42,7 +59,7 @@ def get_item(item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
-
+# Update item
 @app.put("/items/{item_id}", response_model=schemas.Item)
 def update_item(item_id: int, item: schemas.ItemUpdate, db: Session = Depends(get_db)):
     db_item = db.query(model.Item).filter(model.Item.id == item_id).first()
@@ -56,6 +73,7 @@ def update_item(item_id: int, item: schemas.ItemUpdate, db: Session = Depends(ge
     db.refresh(db_item)
     return db_item
 
+# Delete item
 @app.delete("/items/{item_id}", response_model=schemas.Item)    
 def delete_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(model.Item).filter(model.Item.id == item_id).first()

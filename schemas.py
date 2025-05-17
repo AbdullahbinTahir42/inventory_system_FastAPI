@@ -1,27 +1,41 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-# Common base fields for items
+
 class ItemBase(BaseModel):
     name: str
     description: Optional[str] = None
-    price: float
-    quantity: Optional[int] = None
+    price: float = Field(..., ge=0, description="Price must be non-negative")
+    quantity: Optional[int] = Field(None, gt=0, description="Quantity must be greater than zero")
 
-# Schema for creating a new item (all fields required)
+    @field_validator("quantity")
+    @classmethod
+    def validate_quantity(cls, v):
+        if v is not None and v <= 0:
+            raise ValueError("Quantity must be greater than zero")
+        return v
+
+
 class ItemCreate(ItemBase):
     pass
-
-# Schema for reading/returning an item (includes ID)
-class Item(ItemBase):
-    id: int
-
-    class Config:
-        orm_mode = True
 
 
 class ItemUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    price: Optional[float] = None
-    quantity: Optional[int] = None
+    price: Optional[float] = Field(None, ge=0)
+    quantity: Optional[int] = Field(None, gt=0)
+
+    @field_validator("quantity")
+    @classmethod
+    def validate_quantity(cls, v):
+        if v is not None and v <= 0:
+            raise ValueError("Quantity must be greater than zero")
+        return v
+
+
+class Item(ItemBase):
+    id: int
+
+    class Config:
+        orm_mode = True
