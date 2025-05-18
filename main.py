@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException, Query, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
-from typing import Optional, List
 import model, schemas
 from database import SessionLocal, engine, Base
 
