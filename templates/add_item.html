@@ -1,0 +1,12 @@
+{% extends "main.html" %}
+{% block content %}
+    <h2>Add New Item</h2>
+    <form method="post" action="/add?admin=true">
+        <label>Name: <input type="text" name="name" required></label><br>
+        <label>Description: <input type="text" name="description"></label><br>
+        <label>Price: <input type="number" name="price" step="0.01" required></label><br>
+        <label>Quantity: <input type="number" name="quantity" required></label><br>
+        <button type="submit">Add Item</button>
+    </form>
+    <a href="/">Back to Home</a>
+{% endblock %}

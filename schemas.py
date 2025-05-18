@@ -33,9 +33,9 @@ class ItemUpdate(BaseModel):
             raise ValueError("Quantity must be greater than zero")
         return v
 
-
 class Item(ItemBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+

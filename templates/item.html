@@ -1,0 +1,12 @@
+{% extends "main.html" %}
+{% block content %}
+    <h2>{{ item.name }}</h2>
+    <p><strong>Price:</strong> ${{ item.price }}</p>
+    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+    <p><strong>Description:</strong> {{ item.description }}</p>
+
+    <form method="post" action="/delete/{{ item.id }}?admin=true">
+        <button type="submit">Delete (Admin Only)</button>
+    </form>
+    <a href="/">Back to Home</a>
+{% endblock %}

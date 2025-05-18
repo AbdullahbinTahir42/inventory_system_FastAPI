@@ -1,14 +1,17 @@
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, Form
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
+from typing import Optional, List
 import model, schemas
 from database import SessionLocal, engine, Base
-from typing import Optional, List
 
-Base.metadata.create_all(bind=engine)  # create tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
-# Dependency for DB session
+# Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -16,70 +19,50 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/")
-def root():
-    return {"message": "Welcome To our store"}
 
-# Create item
-@app.post("/items/", response_model=schemas.Item)
-def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    new_item = model.Item(**item.model_dump())
-    db.add(new_item)
-    db.commit()
-    db.refresh(new_item)
-    return new_item
+@app.get("/", response_class=HTMLResponse)
+def home_ui(request: Request, db: Session = Depends(get_db)):
+    items = db.query(model.Item).all()
+    return templates.TemplateResponse("items.html", {"request": request, "items": items})
 
-# Get all items with optional filters
-@app.get("/items/", response_model=List[schemas.Item])
-def get_items(
-    name: Optional[str] = Query(None, description="Filter by item name"),
-    min_price: Optional[float] = Query(None, description="Minimum price"),
-    max_price: Optional[float] = Query(None, description="Maximum price"),
-    min_quantity: Optional[int] = Query(None, description="Minimum quantity"),
+
+@app.get("/item/{item_id}", response_class=HTMLResponse)
+def item_detail_ui(item_id: int, request: Request, db: Session = Depends(get_db)):
+    item = db.query(model.Item).filter(model.Item.id == item_id).first()
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return templates.TemplateResponse("item.html", {"request": request, "item": item})
+
+
+@app.get("/add", response_class=HTMLResponse)
+def add_item_form_ui(request: Request):
+    return templates.TemplateResponse("add_item.html", {"request": request})
+
+
+@app.post("/add")
+def add_item_ui(
+    name: str = Form(...),
+    description: str = Form(""),
+    price: float = Form(...),
+    quantity: int = Form(...),
+    admin: bool = Query(False),
     db: Session = Depends(get_db)
 ):
-    query = db.query(model.Item)
-
-    if name:
-        query = query.filter(model.Item.name.ilike(f"%{name}%"))
-    if min_price is not None:
-        query = query.filter(model.Item.price >= min_price)
-    if max_price is not None:
-        query = query.filter(model.Item.price <= max_price)
-    if min_quantity is not None:
-        query = query.filter(model.Item.quantity >= min_quantity)
-
-    return query.all()
-
-# Get item by ID
-@app.get("/items/{item_id}", response_model=schemas.Item)
-def get_item(item_id: int, db: Session = Depends(get_db)):
-    item = db.query(model.Item).filter(model.Item.id == item_id).first()
-    if item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
-
-# Update item
-@app.put("/items/{item_id}", response_model=schemas.Item)
-def update_item(item_id: int, item: schemas.ItemUpdate, db: Session = Depends(get_db)):
-    db_item = db.query(model.Item).filter(model.Item.id == item_id).first()
-    if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    
-    for key, value in item.model_dump(exclude_unset=True).items():
-        setattr(db_item, key, value)
-    
+    if not admin:
+        raise HTTPException(status_code=403, detail="Only admin can add items")
+    new_item = model.Item(name=name, description=description, price=price, quantity=quantity)
+    db.add(new_item)
     db.commit()
-    db.refresh(db_item)
-    return db_item
+    return RedirectResponse(url="/", status_code=303)
 
-# Delete item
-@app.delete("/items/{item_id}", response_model=schemas.Item)    
-def delete_item(item_id: int, db: Session = Depends(get_db)):
+
+@app.post("/delete/{item_id}")
+def delete_item_ui(item_id: int, admin: bool = Query(False), db: Session = Depends(get_db)):
+    if not admin:
+        raise HTTPException(status_code=403, detail="Only admin can delete items")
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    
     db.delete(item)
     db.commit()
-    return item
+    return RedirectResponse(url="/", status_code=303)
