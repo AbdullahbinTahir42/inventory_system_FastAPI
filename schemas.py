@@ -1,12 +1,21 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, EmailStr
 from typing import Optional
 
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
 class ItemBase(BaseModel):
     name: str
     description: Optional[str] = None
     price: float = Field(..., ge=0, description="Price must be non-negative")
-    quantity: Optional[int] = Field(None, gt=0, description="Quantity must be greater than zero")
+    quantity: int = Field(..., gt=0, description="Quantity must be greater than zero")
 
     @field_validator("quantity")
     @classmethod

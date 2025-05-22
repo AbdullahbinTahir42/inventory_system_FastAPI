@@ -4,6 +4,11 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 import model, schemas
 from database import SessionLocal, engine, Base
+from utils import hash_password, verify_password
+
+hashed = hash_password("mysecret")
+print(verify_password("mysecret", hashed))  # True
+
 
 Base.metadata.create_all(bind=engine)
 
