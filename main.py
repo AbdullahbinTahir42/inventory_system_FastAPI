@@ -85,6 +85,10 @@ def item_detail_ui(item_id: int, request: Request, db: Session = Depends(get_db)
 
 @app.get("/add", response_class=HTMLResponse)
 def add_item_form_ui(request: Request):
+    user = request.cookies.get("user")
+    if user != "admin":
+        return RedirectResponse(url="/")
+        
     return templates.TemplateResponse("add_item.html", {"request": request})
 
 
@@ -98,7 +102,7 @@ def add_item_ui(
     db: Session = Depends(get_db)
 ):
     user = request.cookies.get("user")
-    if not user:
+    if user != "admin":
         raise HTTPException(status_code=403, detail="Login required")
 
     new_item = model.Item(name=name, description=description, price=price, quantity=quantity)
@@ -114,15 +118,11 @@ def delete_item_ui(
     db: Session = Depends(get_db)
 ):
     user = request.cookies.get("user")
-    if not user:
-        raise HTTPException(status_code=403, detail="Login required to delete items")
-
+    if user != "admin":
+        return RedirectResponse(url="/")
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    if user != "admin":
-        raise HTTPException(status_code=403, detail="Only admin can delete items")
-
     db.delete(item)
     db.commit()
     return RedirectResponse(url="/", status_code=303)
@@ -132,6 +132,9 @@ def delete_item_ui(
 @app.get("/edit/{item_id}", response_class=HTMLResponse)
 def edit_item_form(item_id: int, request: Request, db: Session = Depends(get_db)):
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
+    user = request.cookies.get("user")
+    if user != "admin":
+        return RedirectResponse(url="/")
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return templates.TemplateResponse("edit_item.html", {"request": request, "item": item})
