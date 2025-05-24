@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, Form
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, Form, Path
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
@@ -23,6 +23,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+
+@app.get("/logout")
+def logout():
+    response = RedirectResponse(url="/", status_code=303)
+    response.delete_cookie("user")
+    return response
 
 
 @app.get("/register", response_class=HTMLResponse)
@@ -116,5 +124,40 @@ def delete_item_ui(
         raise HTTPException(status_code=403, detail="Only admin can delete items")
 
     db.delete(item)
+    db.commit()
+    return RedirectResponse(url="/", status_code=303)
+
+
+
+@app.get("/edit/{item_id}", response_class=HTMLResponse)
+def edit_item_form(item_id: int, request: Request, db: Session = Depends(get_db)):
+    item = db.query(model.Item).filter(model.Item.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return templates.TemplateResponse("edit_item.html", {"request": request, "item": item})
+
+@app.post("/edit/{item_id}")
+def update_item(
+    item_id: int = Path(...),
+    name: str = Form(...),
+    description: str = Form(""),
+    price: float = Form(...),
+    quantity: int = Form(...),
+    request: Request = None,
+    db: Session = Depends(get_db)
+):
+    user = request.cookies.get("user")
+    if user != "admin":
+        raise HTTPException(status_code=403, detail="Only admin can edit items")
+
+    item = db.query(model.Item).filter(model.Item.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    item.name = name
+    item.description = description
+    item.price = price
+    item.quantity = quantity
+
     db.commit()
     return RedirectResponse(url="/", status_code=303)

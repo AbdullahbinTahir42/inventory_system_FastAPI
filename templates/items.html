@@ -1,13 +1,17 @@
-{% extends "main.html" %}
-{% block content %}
-    <ul>
-        {% for item in items %}
-            <li>
-                <a href="/item/{{ item.id }}">{{ item.name }}</a> - ${{ item.price }} (Qty: {{ item.quantity }})
-            </li>
-        {% endfor %}
-    </ul>
+{% extends "main.html" %} {% block content %}
+<ul>
+  <li><strong>Name | Price | Quantity</strong></li>
+  {% for item in items %}
+  <li>
+    <a href="/item/{{ item.id }}">{{ item.name }}</a> -
+    ${{ item.price }} (Qty: {{ item.quantity }})
+  </li>
+  {% endfor %}
+</ul>
 
-    <h3>Admin Actions</h3>
-    <a href="/add?admin=true">Add New Item</a>
+{% if request.cookies.get("user") == "admin" %}
+<h3>Admin Actions</h3>
+<a href="/add">Add New Item</a>
+{% endif %}
 {% endblock %}
+

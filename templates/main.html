@@ -4,7 +4,18 @@
     <title>Inventory Home</title>
 </head>
 <body>
+
     <h1>Welcome to the Inventory System</h1>
+   <p>
+  {% if request.cookies.get("user") %}
+    Welcome, {{ request.cookies.get("user") }} |
+    <a href="/logout">Logout</a>
+  {% else %}
+    <a href="/login">Login</a> | <a href="/register">Register</a>
+  {% endif %}
+</p>
+    
+
     <hr>
     {% block content %}{% endblock %}
 </body>

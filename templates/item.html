@@ -7,6 +7,7 @@
 
     <form method="post" action="/delete/{{ item.id }}?admin=true">
         <button type="submit">Delete (Admin Only)</button>
+        <a href="/edit/{{ item.id }}">Edit</a>
     </form>
     <a href="/">Back to Home</a>
 {% endblock %}
