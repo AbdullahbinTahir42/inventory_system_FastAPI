@@ -8,8 +8,8 @@ from utils import hash_password, verify_password
 from pydantic import ValidationError
 
 
-hashed = hash_password("mysecret")
-print(verify_password("mysecret", hashed))  # True
+# hashed = hash_password("mysecret")
+# print(verify_password("mysecret", hashed))  # True
 
 
 Base.metadata.create_all(bind=engine)
@@ -50,7 +50,9 @@ def register_user(
     new_user = model.User(username=username, hashed_password=hash_password(password))
     db.add(new_user)
     db.commit()
-    return RedirectResponse(url="/login", status_code=303)
+    response = RedirectResponse(url="/", status_code=303)
+    response.set_cookie("user", username)
+    return response
 
 @app.get("/login", response_class=HTMLResponse)
 def login_form(request: Request):
