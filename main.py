@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import model, schemas
 from database import SessionLocal, engine, Base
 from utils import hash_password, verify_password
+from pydantic import ValidationError
 
 
 hashed = hash_password("mysecret")
@@ -103,9 +104,19 @@ def add_item_ui(
 ):
     user = request.cookies.get("user")
     if user != "admin":
-        raise HTTPException(status_code=403, detail="Login required")
+        raise HTTPException(status_code=403, detail="Admin access required")
 
-    new_item = model.Item(name=name, description=description, price=price, quantity=quantity)
+    try:
+        item_data = schemas.ItemBase(
+            name=name,
+            description=description,
+            price=price,
+            quantity=quantity
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail="quantity must be greater than zero")
+
+    new_item = model.Item(**item_data.model_dump())
     db.add(new_item)
     db.commit()
     return RedirectResponse(url="/", status_code=303)
@@ -139,6 +150,8 @@ def edit_item_form(item_id: int, request: Request, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Item not found")
     return templates.TemplateResponse("edit_item.html", {"request": request, "item": item})
 
+from pydantic import ValidationError  # Ensure this is imported
+
 @app.post("/edit/{item_id}")
 def update_item(
     item_id: int = Path(...),
@@ -157,10 +170,23 @@ def update_item(
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
 
-    item.name = name
-    item.description = description
-    item.price = price
-    item.quantity = quantity
+    # Validate using Pydantic schema
+    try:
+        item_data = schemas.ItemBase(
+            name=name,
+            description=description,
+            price=price,
+            quantity=quantity
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors())
+
+    # Update the item
+    item.name = item_data.name
+    item.description = item_data.description
+    item.price = item_data.price
+    item.quantity = item_data.quantity
 
     db.commit()
     return RedirectResponse(url="/", status_code=303)
+

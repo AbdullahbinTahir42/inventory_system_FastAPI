@@ -1,5 +1,15 @@
-<form method="post">
-  <input name="username" placeholder="Username" required>
-  <input type="password" name="password" placeholder="Password" required>
-  <button type="submit">Register</button>
+{% extends "main.html" %}
+{% block content %}
+<h2>Register</h2>
+<form method="post" style="max-width: 400px; margin: auto;">
+  <div style="margin-bottom: 10px;">
+    <label for="username">Username</label><br>
+    <input id="username" name="username" type="text" placeholder="Enter username" required style="width: 100%; padding: 8px;">
+  </div>
+  <div style="margin-bottom: 10px;">
+    <label for="password">Password</label><br>
+    <input id="password" name="password" type="password" placeholder="Enter password" required style="width: 100%; padding: 8px;">
+  </div>
+  <button type="submit" style="padding: 10px 20px;">Register</button>
 </form>
+{% endblock %}

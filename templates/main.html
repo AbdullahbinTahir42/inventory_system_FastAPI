@@ -1,22 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Inventory Home</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inventory Home</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      max-width: 900px;
+      margin: 0 auto 30px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #222;
+    }
+    nav a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 600;
+      margin-left: 15px;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+    hr {
+      max-width: 900px;
+      margin: 0 auto 30px auto;
+      border: none;
+      border-top: 1px solid #ddd;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgb(0 0 0 / 0.1);
+    }
+  </style>
 </head>
 <body>
-
+  <header>
     <h1>Welcome to the Inventory System</h1>
-   <p>
-  {% if request.cookies.get("user") %}
-    Welcome, {{ request.cookies.get("user") }} |
-    <a href="/logout">Logout</a>
-  {% else %}
-    <a href="/login">Login</a> | <a href="/register">Register</a>
-  {% endif %}
-</p>
-    
+    <nav>
+      {% if request.cookies.get("user") %}
+        <span>Welcome, {{ request.cookies.get("user") }}</span> |
+        <a href="/logout">Logout</a>
+      {% else %}
+        <a href="/login">Login</a>
+      {% endif %}
+    </nav>
+  </header>
 
-    <hr>
+  <hr />
+
+  <main>
     {% block content %}{% endblock %}
+  </main>
 </body>
 </html>

@@ -1,17 +1,92 @@
-{% extends "main.html" %} {% block content %}
-<ul>
-  <li><strong>Name | Price | Quantity</strong></li>
-  {% for item in items %}
-  <li>
-    <a href="/item/{{ item.id }}">{{ item.name }}</a> -
-    ${{ item.price }} (Qty: {{ item.quantity }})
-  </li>
-  {% endfor %}
-</ul>
+{% extends "main.html" %}
+{% block content %}
+  <style>
+    h2 {
+      color: #222;
+      margin-bottom: 20px;
+      font-family: Arial, sans-serif;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    thead tr {
+      background-color: #f7f7f7;
+      border-bottom: 2px solid #ddd;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      color: #333;
+    }
+    tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    a:hover {
+      text-decoration: underline;
+      color: #0056b3;
+    }
+    .admin-actions {
+      margin-top: 25px;
+      font-family: Arial, sans-serif;
+    }
+    .admin-actions h3 {
+      margin-bottom: 10px;
+      color: #222;
+    }
+    .btn-add {
+      display: inline-block;
+      padding: 10px 16px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    .btn-add:hover {
+      background-color: #1e7e34;
+    }
+  </style>
 
-{% if request.cookies.get("user") == "admin" %}
-<h3>Admin Actions</h3>
-<a href="/add">Add New Item</a>
-{% endif %}
+  <h2>Inventory</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>
+          <a href="/item/{{ item.id }}">{{ item.name }}</a>
+        </td>
+        <td>${{ item.price }}</td>
+        <td>{{ item.quantity }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if request.cookies.get("user") == "admin" %}
+    <div class="admin-actions">
+      <h3>Admin Actions</h3>
+      <a href="/add" class="btn-add">Add New Item</a>
+    </div>
+  {% endif %}
 {% endblock %}
-

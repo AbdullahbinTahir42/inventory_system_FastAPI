@@ -1,12 +1,90 @@
 {% extends "main.html" %}
 {% block content %}
-    <h2>Add New Item</h2>
-    <form method="post" action="/add?admin=true">
-        <label>Name: <input type="text" name="name" required></label><br>
-        <label>Description: <input type="text" name="description"></label><br>
-        <label>Price: <input type="number" name="price" step="0.01" required></label><br>
-        <label>Quantity: <input type="number" name="quantity" required></label><br>
-        <button type="submit">Add Item</button>
-    </form>
-    <a href="/">Back to Home</a>
+  <style>
+    form {
+      max-width: 400px;
+      margin: 30px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fafafa;
+      font-family: Arial, sans-serif;
+    }
+    h2 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 25px;
+    }
+    div {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+      color: #333;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+    button {
+      width: 100%;
+      padding: 10px 0;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+  <h2>Add New Item</h2>
+  <form method="post" action="/add?admin=true">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" name="name" id="name" required>
+    </div>
+    <div>
+      <label for="description">Description:</label>
+      <input type="text" name="description" id="description">
+    </div>
+    <div>
+      <label for="price">Price:</label>
+      <input type="number" name="price" id="price" step="0.01" required>
+    </div>
+    <div>
+      <label for="quantity">Quantity:</label>
+      <input type="number" name="quantity" id="quantity" required>
+    </div>
+    <button type="submit">Add Item</button>
+  </form>
+  <a href="/">← Back to Home</a>
 {% endblock %}

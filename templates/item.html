@@ -1,13 +1,25 @@
 {% extends "main.html" %}
 {% block content %}
-    <h2>{{ item.name }}</h2>
+<div style="max-width: 600px; margin: 2rem auto; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa;">
+    <h2 style="margin-bottom: 1rem;">{{ item.name }}</h2>
+
     <p><strong>Price:</strong> ${{ item.price }}</p>
     <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-    <p><strong>Description:</strong> {{ item.description }}</p>
+    <p><strong>Description:</strong> {{ item.description or "No description provided." }}</p>
 
-    <form method="post" action="/delete/{{ item.id }}?admin=true">
-        <button type="submit">Delete (Admin Only)</button>
-        <a href="/edit/{{ item.id }}">Edit</a>
-    </form>
-    <a href="/">Back to Home</a>
+    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <form method="post" action="/delete/{{ item.id }}?admin=true" style="display: inline;">
+            <button type="submit" style="background-color: #e63946; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                Delete
+            </button>
+        </form>
+        <a href="/edit/{{ item.id }}" style="background-color: #1d3557; color: #fff; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">
+            Edit
+        </a>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <a href="/" style="color: #333; text-decoration: none;">← Back to Home</a>
+    </div>
+</div>
 {% endblock %}
