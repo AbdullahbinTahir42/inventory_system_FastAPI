@@ -4,7 +4,14 @@
     <h2 style="margin-bottom: 1rem;">{{ item.name }}</h2>
 
     <p><strong>Price:</strong> ${{ item.price }}</p>
-    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+    <p><strong>Quantity:</strong> {{ item.quantity }}
+  {% if item.quantity < 5 and item.quantity > 0 %}
+    <span style="color: red;">⚠️ Low Stock</span>
+  {% elif item.quantity == 0 %}
+    <span style="color: red;">❌ Out of Stock</span>
+  {% endif %}
+</p>
+
     <p><strong>Description:</strong> {{ item.description or "No description provided." }}</p>
 
     <div style="margin-top: 2rem; display: flex; gap: 1rem;">

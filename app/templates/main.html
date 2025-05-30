@@ -60,7 +60,7 @@
         <span>Welcome, {{ request.cookies.get("user") }}</span> |
         <a href="/logout">Logout</a>
       {% else %}
-        <a href="/login">Login</a>
+        <a href="/login">Login</a> / <a href="/register">Register</a>
       {% endif %}
     </nav>
   </header>
@@ -70,5 +70,11 @@
   <main>
     {% block content %}{% endblock %}
   </main>
+  <script>
+  function togglePassword() {
+    const passwordInput = document.getElementById("password");
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+  }
+</script>
 </body>
 </html>
