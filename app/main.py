@@ -89,7 +89,7 @@ def item_detail_ui(item_id: int, request: Request, db: Session = Depends(get_db)
 @app.get("/add", response_class=HTMLResponse)
 def add_item_form_ui(request: Request):
     user = request.cookies.get("user")
-    if user != "admin":
+    if user not in ["admin" , "admin2"]:
         return RedirectResponse(url="/")
         
     return templates.TemplateResponse("add_item.html", {"request": request})
@@ -105,7 +105,7 @@ def add_item_ui(
     db: Session = Depends(get_db)
 ):
     user = request.cookies.get("user")
-    if user != "admin":
+    if user not in ["admin" ,"admin2"]:
         raise HTTPException(status_code=403, detail="Admin access required")
 
     try:

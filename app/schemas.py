@@ -17,13 +17,13 @@ class ItemBase(BaseModel):
     name: str
     description: Optional[str] = None
     price: float = Field(..., ge=0, description="Price must be non-negative")
-    quantity: int = Field(..., gt=0, description="Quantity must be greater than zero")
+    quantity: int = Field(..., ge=0, description="Quantity must not be negative")
 
     @field_validator("quantity")
     @classmethod
     def validate_quantity(cls, v):
-        if v is not None and v <= 0:
-            raise ValueError("Quantity must be greater than zero")
+        if v is not None and v < 0:
+            raise ValueError("Quantity must be non-negative")
         return v
 
 
