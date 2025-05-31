@@ -2,18 +2,30 @@
 {% block content %}
 <h2>Register</h2>
 <form method="post" style="max-width: 400px; margin: auto;">
+
+  <!-- Username Field -->
   <div style="margin-bottom: 10px;">
     <label for="username">Username</label><br>
     <input id="username" name="username" type="text" placeholder="Enter username" required style="width: 100%; padding: 8px;">
   </div>
+
+  <!-- Email Field -->
+  <div style="margin-bottom: 10px;">
+    <label for="email">Email</label><br>
+    <input id="email" name="email" type="email" placeholder="Enter email" required style="width: 100%; padding: 8px;">
+  </div>
+
+  <!-- Password Field -->
   <div style="margin-bottom: 10px; position: relative;">
-  <input type="password" id="password" name="password" placeholder="Password" required 
-         style="width: 100%; padding: 8px; box-sizing: border-box; padding-right: 40px;">
-  <span onclick="togglePassword()" 
-        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
-    👁️
-  </span>
-</div>
+    <label for="password">Password</label><br>
+    <input type="password" id="password" name="password" placeholder="Password" required 
+           style="width: 100%; padding: 8px; box-sizing: border-box; padding-right: 40px;">
+    <span onclick="togglePassword()" 
+          style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
+      👁️
+    </span>
+  </div>
+
   <button type="submit" style="padding: 10px 20px;">Register</button>
 </form>
 {% endblock %}

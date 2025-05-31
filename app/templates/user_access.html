@@ -1,0 +1,64 @@
+{% extends "main.html" %}
+{% block content %}
+
+<style>
+  .top-bar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+  }
+  .back-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  .user-list {
+    max-width: 600px;
+    margin: auto;
+  }
+  .user-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .user-row input {
+    flex: 1;
+    padding: 8px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  .grant-button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>
+
+<div class="top-bar">
+  <a href="/" class="back-button">← Back to Home</a>
+</div>
+
+<div class="user-list">
+  <h2>User Access Control</h2>
+
+  {% for user in users %}
+  <form method="post" action="" class="user-row">
+    <input type="text" name="username" value="{{ user.username }}" readonly>
+    {% if user.nickname != "admin"  %}
+    <button type="submit" class="grant-button">Grant</button>
+    {% else %}
+    <button type="submit" class="grant-button">Remove</button>
+    {% endif %}
+  </form>
+  {% endfor %}
+</div>
+
+{% endblock %}

@@ -116,10 +116,11 @@
       </tbody>
     </table>
 
-    {% if request.cookies.get("user") in ["admin", "admin2"] %}
+    {% if user and (user.username == "admin" or user.nickname == "admin") %}
   <div class="admin-actions">
       <h3>Admin Actions</h3>
       <a href="/add" class="btn-add">Add New Item</a>
+      <a href="/grant_access" class="btn-add">Manage User Access</a>
     </div>
     {% endif %}
   </div>

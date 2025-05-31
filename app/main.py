@@ -42,12 +42,13 @@ def register_form(request: Request):
 def register_user(
     username: str = Form(...),
     password: str = Form(...),
+    email: str = Form(...),
     db: Session = Depends(get_db)
 ):
     existing_user = db.query(model.User).filter(model.User.username == username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
-    new_user = model.User(username=username, hashed_password=hash_password(password))
+    new_user = model.User(username=username, hashed_password=hash_password(password),email=email)
     db.add(new_user)
     db.commit()
     response = RedirectResponse(url="/", status_code=303)
@@ -74,8 +75,10 @@ def login_user(
 
 @app.get("/", response_class=HTMLResponse)
 def home_ui(request: Request, db: Session = Depends(get_db)):
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
     items = db.query(model.Item).all()
-    return templates.TemplateResponse("items.html", {"request": request, "items": items})
+    return templates.TemplateResponse("items.html", {"request": request, "items": items, "user": user})
 
 
 @app.get("/item/{item_id}", response_class=HTMLResponse)
@@ -87,9 +90,10 @@ def item_detail_ui(item_id: int, request: Request, db: Session = Depends(get_db)
 
 
 @app.get("/add", response_class=HTMLResponse)
-def add_item_form_ui(request: Request):
-    user = request.cookies.get("user")
-    if user not in ["admin" , "admin2"]:
+def add_item_form_ui(request: Request, db: Session = Depends(get_db)):
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
+    if not user or (user.username != "admin" and user.nickname != "admin"):
         return RedirectResponse(url="/")
         
     return templates.TemplateResponse("add_item.html", {"request": request})
@@ -104,8 +108,9 @@ def add_item_ui(
     quantity: int = Form(...),
     db: Session = Depends(get_db)
 ):
-    user = request.cookies.get("user")
-    if user not in ["admin" ,"admin2"]:
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
+    if not user or (user.username != "admin" and user.nickname != "admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
 
     try:
@@ -130,8 +135,9 @@ def delete_item_ui(
     request: Request,
     db: Session = Depends(get_db)
 ):
-    user = request.cookies.get("user")
-    if user != "admin":
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
+    if not user or (user.username != "admin" and user.nickname != "admin"):
         return RedirectResponse(url="/")
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
     if item is None:
@@ -145,14 +151,14 @@ def delete_item_ui(
 @app.get("/edit/{item_id}", response_class=HTMLResponse)
 def edit_item_form(item_id: int, request: Request, db: Session = Depends(get_db)):
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
-    user = request.cookies.get("user")
-    if user != "admin":
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
+    if not user or (user.username != "admin" and user.nickname != "admin"):
         return RedirectResponse(url="/")
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return templates.TemplateResponse("edit_item.html", {"request": request, "item": item})
 
-from pydantic import ValidationError  # Ensure this is imported
 
 @app.post("/edit/{item_id}")
 def update_item(
@@ -164,8 +170,9 @@ def update_item(
     request: Request = None,
     db: Session = Depends(get_db)
 ):
-    user = request.cookies.get("user")
-    if user != "admin":
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
+    if not user or (user.username != "admin" and user.nickname != "admin"):
         raise HTTPException(status_code=403, detail="Only admin can edit items")
 
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
@@ -192,3 +199,30 @@ def update_item(
     db.commit()
     return RedirectResponse(url="/", status_code=303)
 
+
+@app.get("/grant_access", response_class=HTMLResponse)
+def access_ui(request: Request, db: Session = Depends(get_db)):
+    if request.cookies.get("user") != "admin":
+        return RedirectResponse(url="/")
+    users = db.query(model.User).filter(model.User.username != "admin").all()
+    return templates.TemplateResponse("user_access.html", {"request": request, "users": users})
+
+@app.post("/grant_access")
+def grant_access(
+    request: Request,
+    username: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    if request.cookies.get("user") != "admin":
+        return RedirectResponse(url="/")
+    
+    user = db.query(model.User).filter(model.User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.nickname == "admin":
+        user.nickname = None
+    else:
+        user.nickname = "admin"
+    
+    db.commit()
+    return RedirectResponse(url="/grant_access", status_code=303)
