@@ -1,27 +1,115 @@
 {% extends "main.html" %}
 {% block content %}
-<form method="post" style="max-width: 300px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
-  <h2 style="text-align: center;">Login</h2>
-  <div style="margin-bottom: 10px;">
-    <input name="username" placeholder="Username" required style="width: 100%; padding: 8px; box-sizing: border-box;">
-  </div>
-  <div style="margin-bottom: 10px; position: relative;">
-  <input type="password" id="password" name="password" placeholder="Password" required 
-         style="width: 100%; padding: 8px; box-sizing: border-box; padding-right: 40px;">
-  <span onclick="togglePassword()" 
-        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
-    👁️
-  </span>
-</div>
-  <div style="text-align: center;">
-    <button type="submit" style="padding: 8px 16px;">Login</button>
-  </div>
-  {% if error %}
-    <p style="color:red; text-align: center; margin-top: 10px;">{{ error }}</p>
-  {% endif %}
-</form>
+<style>
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+  }
 
-{% if not user %}
-  <p style="text-align: center; margin-top: 20px;">Don't have an account? <a href="/register">Register here</a></p>
-{% endif %}
+  .instructions {
+    width: 300px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .instructions h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+  }
+
+  .instructions ul {
+    padding-left: 20px;
+    margin: 0;
+    color: #555;
+  }
+
+  .login-form {
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .login-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #444;
+  }
+
+  .login-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .login-form .password-wrapper {
+    position: relative;
+  }
+
+  .login-form .password-wrapper span {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  .login-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .login-form button:hover {
+    background-color: #0056b3;
+  }
+
+  .login-form .error {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+  }
+</style>
+
+<div class="container">
+  <div class="instructions">
+    <h3>Instructions</h3>
+    <ul>
+      <li>Only <strong>admin</strong> can add, edit, or delete items.</li>
+      <li>Other users have <strong>view-only</strong> access.</li>
+      <li>Permissions can be granted by admin.</li>
+      <li>Please log in to access full features.</li>
+    </ul>
+  </div>
+
+  <form method="post" class="login-form">
+    <h2>Login</h2>
+    <input name="username" placeholder="Username" required>
+    <div class="password-wrapper">
+      <input type="password" id="password" name="password" placeholder="Password" required>
+      <span onclick="togglePassword()">👁️</span>
+    </div>
+    <button type="submit">Login</button>
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </form>
+</div>
 {% endblock %}

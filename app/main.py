@@ -36,15 +36,20 @@ def logout():
 
 @app.get("/register", response_class=HTMLResponse)
 def register_form(request: Request):
+    if request.cookies.get("user") != 'admin':
+        return RedirectResponse(url="/", status_code=303)
     return templates.TemplateResponse("register.html", {"request": request})
 
 @app.post("/register")
 def register_user(
+    request: Request,
     username: str = Form(...),
     password: str = Form(...),
     email: str = Form(...),
     db: Session = Depends(get_db)
 ):
+    if request.cookies.get("user") != 'admin':
+        return RedirectResponse(url="/", status_code=303)
     existing_user = db.query(model.User).filter(model.User.username == username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -76,6 +81,8 @@ def login_user(
 @app.get("/", response_class=HTMLResponse)
 def home_ui(request: Request, db: Session = Depends(get_db)):
     username = request.cookies.get("user")
+    if not username:
+        return RedirectResponse(url="/login", status_code=303)
     user = db.query(model.User).filter(model.User.username == username).first()
     items = db.query(model.Item).all()
     return templates.TemplateResponse("items.html", {"request": request, "items": items, "user": user})

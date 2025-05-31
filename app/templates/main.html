@@ -54,13 +54,16 @@
 </head>
 <body>
   <header>
-    <h1>Welcome to the Inventory System</h1>
+    <h1>Welcome to the <a href="/"> Inventory System</a></h1>
     <nav>
       {% if request.cookies.get("user") %}
         <span>Welcome, {{ request.cookies.get("user") }}</span> |
         <a href="/logout">Logout</a>
+        {% if request.cookies.get("user") == 'admin' %}
+          | <a href="/register">Register New User</a>
+        {% endif %}
       {% else %}
-        <a href="/login">Login</a> / <a href="/register">Register</a>
+        <a href="/login">Login</a>
       {% endif %}
     </nav>
   </header>
