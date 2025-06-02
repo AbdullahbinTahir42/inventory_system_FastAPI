@@ -1,89 +1,52 @@
-{% extends "main.html" %} {% block content %}
+{% extends "main.html" %}
+{% block content %}
 <style>
-  form {
-    max-width: 400px;
+  .form-container {
+    max-width: 550px; /* Adjusted width */
     margin: 30px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fafafa;
-    font-family: Arial, sans-serif;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
   }
-  h2 {
-    text-align: center;
-    color: #222;
-    margin-bottom: 25px;
-  }
-  div {
-    margin-bottom: 15px;
-  }
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 6px;
-    color: #333;
-  }
-  input[type="text"],
-  input[type="number"] {
+  .form-container .btn-primary {
     width: 100%;
-    padding: 8px 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-  }
-  input[type="text"]:focus,
-  input[type="number"]:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-  button {
-    width: 100%;
-    padding: 10px 0;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  a {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #007bff;
-    text-decoration: none;
-    font-weight: 600;
-  }
-  a:hover {
-    text-decoration: underline;
+    padding: 0.625rem 1rem; /* 10px 16px */
+    font-size: 1rem;
+    margin-top: 10px; /* Add some space above button */
   }
 </style>
 
-<h2>Add New Item</h2>
-<form method="post" action="/add?admin=true">
-  <div>
-    <label for="name">Name:</label>
-    <input type="text" name="name" id="name" required />
-  </div>
-  <div>
-    <label for="description">Description:</label>
-    <input type="text" name="description" id="description" />
-  </div>
-  <div>
-    <label for="price">Price:</label>
-    <input type="number" name="price" id="price" step="0.01" required />
-  </div>
-  <div>
-    <label for="quantity">Quantity:</label>
-    <input type="number" name="quantity" id="quantity" required />
-  </div>
-  <button type="submit">Add Item</button>
-</form>
-<a href="/">← Back to Home</a>
+<div class="form-container">
+  <h2 class="page-title">Add New Item to Inventory</h2>
+  <form method="post" action="/add?admin=true">
+    <div class="form-group">
+      <label for="name" class="form-label">Item Name:</label>
+      <input type="text" name="name" id="name" class="form-control" required />
+    </div>
+    <div class="form-group">
+      <label for="description" class="form-label">Description:</label>
+      <input type="text" name="description" id="description" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="price" class="form-label">Price ($):</label>
+      <input type="number" name="price" id="price" class="form-control" step="0.01" min="0" required />
+    </div>
+    <div class="form-group">
+      <label for="quantity" class="form-label">Quantity:</label>
+      <input type="number" name="quantity" id="quantity" class="form-control" min="0" required />
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 5px;">
+            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+        </svg>Add Item
+    </button>
+  </form>
+  <a href="/" class="back-link text-center d-block mt-3">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16" style="vertical-align: -0.125em;">
+      <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
+    </svg>
+    Back to Home
+  </a>
+</div>
 {% endblock %}

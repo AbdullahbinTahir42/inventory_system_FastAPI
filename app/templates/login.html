@@ -1,114 +1,108 @@
 {% extends "main.html" %}
 {% block content %}
 <style>
-  .container {
+  .login-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    gap: 40px;
-    padding: 40px 20px;
-    font-family: Arial, sans-serif;
+    align-items: flex-start; /* Changed from center to flex-start for better alignment if content heights differ */
+    gap: 40px; /* Spacing between instructions and form */
+    padding: 20px 0; /* Reduced vertical padding as main already has padding */
   }
 
-  .instructions {
-    width: 300px;
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  .instructions-card {
+    flex: 1; /* Allow it to take up space */
+    max-width: 320px;
+    background-color: var(--light-color); /* Slightly different background */
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-sm);
+    border: 1px solid var(--border-color);
   }
 
-  .instructions h3 {
+  .instructions-card h3 {
     margin-top: 0;
     margin-bottom: 15px;
-    color: #333;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.2rem;
   }
 
-  .instructions ul {
+  .instructions-card ul {
     padding-left: 20px;
     margin: 0;
-    color: #555;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+   .instructions-card ul li {
+    margin-bottom: 8px;
+   }
+
+  .login-form-card {
+    flex: 1; /* Allow it to take up space */
+    max-width: 380px; /* Slightly wider for the form */
+    padding: 30px;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    box-shadow: var(--box-shadow);
   }
 
-  .login-form {
-    width: 300px;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  }
-
-  .login-form h2 {
+  .login-form-card h2 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #444;
+    margin-bottom: 25px;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.6rem;
   }
 
-  .login-form input {
+  .login-form-card .form-group {
+    margin-bottom: 1.25rem; /* 20px */
+  }
+
+  .login-form-card .btn-primary {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 0.625rem 1rem; /* 10px 16px */
+    font-size: 1rem;
   }
 
-  .login-form .password-wrapper {
-    position: relative;
-  }
-
-  .login-form .password-wrapper span {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px;
-  }
-
-  .login-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  .login-form button:hover {
-    background-color: #0056b3;
-  }
-
-  .login-form .error {
-    color: red;
+  .login-error {
+    color: var(--danger-color);
     text-align: center;
-    margin-top: 10px;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    background-color: rgba(220, 53, 69, 0.1);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(220, 53, 69, 0.3);
   }
 </style>
 
-<div class="container">
-  <div class="instructions">
-    <h3>Instructions</h3>
+<div class="login-container">
+  <div class="instructions-card">
+    <h3>Access Guidelines</h3>
     <ul>
-      <li>Only <strong>admin</strong> can add, edit, or delete items.</li>
-      <li>Other users have <strong>view-only</strong> access.</li>
-      <li>Permissions can be granted by admin.</li>
-      <li>Please log in to access full features.</li>
+      <li><strong>Admin users</strong> have full control to add, edit, and delete inventory items.</li>
+      <li>Standard users have <strong>view-only</strong> access to the inventory.</li>
+      <li>User permissions are managed by the system administrator.</li>
+      <li>Please log in to access the system's features based on your role.</li>
     </ul>
   </div>
 
-  <form method="post" class="login-form">
-    <h2>Login</h2>
-    <input name="username" placeholder="Username" required>
-    <div class="password-wrapper">
-      <input type="password" id="password" name="password" placeholder="Password" required>
-      <span onclick="togglePassword()">👁️</span>
+  <form method="post" class="login-form-card">
+    <h2>User Login</h2>
+    <div class="form-group">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
     </div>
-    <button type="submit">Login</button>
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+        <span class="password-toggle" onclick="togglePassword()">👁️</span>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
     {% if error %}
-      <p class="error">{{ error }}</p>
+      <p class="login-error">{{ error }}</p>
     {% endif %}
   </form>
 </div>

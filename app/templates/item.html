@@ -1,32 +1,110 @@
 {% extends "main.html" %}
 {% block content %}
-<div style="max-width: 600px; margin: 2rem auto; padding: 2rem; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa;">
-    <h2 style="margin-bottom: 1rem;">{{ item.name }}</h2>
+<style>
+  .item-details-card {
+    max-width: 700px; /* Increased width for better readability */
+    margin: 2rem auto;
+    padding: 30px; /* Increased padding */
+    background-color: var(--card-bg); /* Consistent card background */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+  }
 
-    <p><strong>Price:</strong> ${{ item.price }}</p>
-    <p><strong>Quantity:</strong> {{ item.quantity }}
-  {% if item.quantity < 5 and item.quantity > 0 %}
-    <span style="color: red;">⚠️ Low Stock</span>
-  {% elif item.quantity == 0 %}
-    <span style="color: red;">❌ Out of Stock</span>
+  .item-details-card h2 {
+    margin-top: 0; /* Remove top margin for heading inside card */
+    margin-bottom: 1.5rem; /* 24px */
+    font-size: 1.8rem; /* Larger title for item name */
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 1px solid var(--border-color); /* Separator for title */
+    padding-bottom: 1rem;
+  }
+
+  .item-details-card p {
+    font-size: 1rem; /* Consistent paragraph font size */
+    margin-bottom: 0.8rem; /* Spacing between paragraphs */
+    color: var(--text-muted); /* Softer text for labels */
+  }
+  .item-details-card p strong {
+    color: var(--text-color); /* Darker text for the actual data */
+    min-width: 100px; /* Align values a bit if needed */
+    display: inline-block;
+  }
+
+  .item-details-card .status-low {
+    color: #fd7e14;
+    font-weight: 500;
+    margin-left: 5px;
+  }
+  .item-details-card .status-out {
+    color: var(--danger-color);
+    font-weight: 500;
+    margin-left: 5px;
+  }
+  .item-details-card .status-in {
+    color: var(--success-color);
+    font-weight: 500;
+    margin-left: 5px;
+  }
+
+
+  .item-actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem; /* Space between buttons */
+    border-top: 1px solid var(--border-color); /* Separator for actions */
+    padding-top: 1.5rem;
+  }
+  
+  /* Styling for back link to be more prominent if needed */
+  .item-details-card .back-link svg { /* If using an SVG icon for back arrow */
+    transition: transform 0.2s ease-in-out;
+  }
+  .item-details-card .back-link:hover svg {
+    transform: translateX(-3px);
+  }
+
+</style>
+
+<div class="item-details-card">
+  <h2>{{ item.name }}</h2>
+
+  <p><strong>Price:</strong> ${{ "%.2f"|format(item.price) }}</p>
+  <p><strong>Quantity:</strong> {{ item.quantity }}
+    {% if item.quantity == 0 %}
+      <span class="status-out">❌ Out of Stock</span>
+    {% elif item.quantity < 5 %}
+      <span class="status-low">⚠️ Low Stock</span>
+    {% else %}
+      <span class="status-in">✔️ In Stock</span>
+    {% endif %}
+  </p>
+  <p><strong>Description:</strong> <span style="color: var(--text-color);">{{ item.description or "No description provided." }}</span></p>
+
+  {% if user and (user.username == "admin" or user.nickname == "admin") %}
+  <div class="item-actions">
+    <form method="post" action="/delete/{{ item.id }}?admin=true" style="display: inline;">
+      <button type="submit" class="btn btn-danger">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 5px;">
+          <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5"/>
+        </svg>Delete Item
+      </button>
+    </form>
+    <a href="/edit/{{ item.id }}" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 5px;">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+        </svg>Edit Item
+    </a>
+  </div>
   {% endif %}
-</p>
 
-    <p><strong>Description:</strong> {{ item.description or "No description provided." }}</p>
-
-    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-        <form method="post" action="/delete/{{ item.id }}?admin=true" style="display: inline;">
-            <button type="submit" style="background-color: #e63946; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
-                Delete
-            </button>
-        </form>
-        <a href="/edit/{{ item.id }}" style="background-color: #1d3557; color: #fff; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none;">
-            Edit
-        </a>
-    </div>
-
-    <div style="margin-top: 1.5rem;">
-        <a href="/" style="color: #333; text-decoration: none;">← Back to Home</a>
-    </div>
+  <a href="/" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+    </svg>
+    Back to Inventory List
+  </a>
 </div>
 {% endblock %}

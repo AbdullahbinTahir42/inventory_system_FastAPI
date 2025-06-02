@@ -1,31 +1,44 @@
 {% extends "main.html" %}
 {% block content %}
-<h2>Register</h2>
-<form method="post" style="max-width: 400px; margin: auto;">
+<style>
+  .register-form-container {
+    max-width: 480px; /* Slightly wider for more fields potentially */
+    margin: 30px auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+  }
+  .register-form-container .btn-primary {
+    width: 100%;
+    padding: 0.625rem 1rem; /* 10px 16px */
+    font-size: 1rem;
+    margin-top: 10px; /* Add some space above button */
+  }
+</style>
 
-  <!-- Username Field -->
-  <div style="margin-bottom: 10px;">
-    <label for="username">Username</label><br>
-    <input id="username" name="username" type="text" placeholder="Enter username" required style="width: 100%; padding: 8px;">
-  </div>
+<div class="register-form-container">
+  <h2 class="page-title">Register New User</h2>
+  <form method="post">
+    <div class="form-group">
+      <label for="username" class="form-label">Username</label>
+      <input id="username" name="username" type="text" class="form-control" placeholder="Enter username" required>
+    </div>
 
-  <!-- Email Field -->
-  <div style="margin-bottom: 10px;">
-    <label for="email">Email</label><br>
-    <input id="email" name="email" type="email" placeholder="Enter email" required style="width: 100%; padding: 8px;">
-  </div>
+    <div class="form-group">
+      <label for="email" class="form-label">Email</label>
+      <input id="email" name="email" type="email" class="form-control" placeholder="Enter email" required>
+    </div>
 
-  <!-- Password Field -->
-  <div style="margin-bottom: 10px; position: relative;">
-    <label for="password">Password</label><br>
-    <input type="password" id="password" name="password" placeholder="Password" required 
-           style="width: 100%; padding: 8px; box-sizing: border-box; padding-right: 40px;">
-    <span onclick="togglePassword()" 
-          style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;">
-      👁️
-    </span>
-  </div>
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
+        <span class="password-toggle" onclick="togglePassword()">👁️</span>
+      </div>
+    </div>
 
-  <button type="submit" style="padding: 10px 20px;">Register</button>
-</form>
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+</div>
 {% endblock %}

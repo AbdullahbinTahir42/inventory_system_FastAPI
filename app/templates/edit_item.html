@@ -1,105 +1,53 @@
 {% extends "main.html" %}
-
 {% block content %}
-  <style>
-    form {
-      max-width: 400px;
-      margin: 20px auto;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background-color: #f9f9f9;
-      font-family: Arial, sans-serif;
-    }
+<style>
+  .form-container { /* Reusing the style from add_item.html */
+    max-width: 550px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+  }
+  .form-container .btn-primary {
+    width: 100%;
+    padding: 0.625rem 1rem; /* 10px 16px */
+    font-size: 1rem;
+    margin-top: 10px;
+  }
+</style>
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #555;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 8px 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 14px;
-      transition: border-color 0.3s ease;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px 0;
-      background-color: #007bff;
-      border: none;
-      color: white;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
-
-  <h2>Edit Item</h2>
-
+<div class="form-container">
+  <h2 class="page-title">Edit Item Details</h2>
   <form action="/edit/{{ item.id }}" method="post">
-    <label for="name">Name:</label>
-    <input
-      type="text"
-      id="name"
-      name="name"
-      value="{{ item.name }}"
-      required
-    />
-
-    <label for="description">Description:</label>
-    <input
-      type="text"
-      id="description"
-      name="description"
-      value="{{ item.description }}"
-    />
-
-    <label for="price">Price:</label>
-    <input
-      type="number"
-      id="price"
-      name="price"
-      value="{{ item.price }}"
-      step="0.01"
-      required
-    />
-
-    <label for="quantity">Quantity:</label>
-    <input
-      type="number"
-      id="quantity"
-      name="quantity"
-      value="{{ item.quantity }}"
-      required
-    />
-
-    <button type="submit">Update Item</button>
+    <div class="form-group">
+      <label for="name" class="form-label">Name:</label>
+      <input type="text" id="name" name="name" class="form-control" value="{{ item.name }}" required />
+    </div>
+    <div class="form-group">
+      <label for="description" class="form-label">Description:</label>
+      <input type="text" id="description" name="description" class="form-control" value="{{ item.description }}" />
+    </div>
+    <div class="form-group">
+      <label for="price" class="form-label">Price ($):</label>
+      <input type="number" id="price" name="price" class="form-control" value="{{ item.price }}" step="0.01" min="0" required />
+    </div>
+    <div class="form-group">
+      <label for="quantity" class="form-label">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" class="form-control" value="{{ item.quantity }}" min="0" required />
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 5px;">
+            <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0"/>
+            <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+        </svg>Update Item
+    </button>
   </form>
+  <a href="/item/{{ item.id }}" class="back-link text-center d-block mt-3">
+     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16" style="vertical-align: -0.125em;">
+      <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
+    </svg>
+    Back to Item
+  </a>
+</div>
 {% endblock %}
-

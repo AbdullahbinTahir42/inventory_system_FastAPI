@@ -1,126 +1,199 @@
 {% extends "main.html" %}
 {% block content %}
 <style>
-  h2 {
-    color: #222;
-    margin-bottom: 20px;
-    font-family: Arial, sans-serif;
-  }
-  .layout {
+  .page-header {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem; /* 24px */
   }
-  .instructions {
-    width: 30%;
-    background-color: #f0f0f0;
-    padding: 15px;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    color: #333;
+  h2.page-title { /* Overriding global page-title style for left alignment */
+    text-align: left;
+    margin-bottom: 0; /* Reset margin as it's handled by page-header */
   }
-  .inventory-section {
-    width: 70%;
+
+  .inventory-layout {
+    display: flex;
+    gap: 30px; /* Increased gap */
   }
-  table {
+
+  .instructions-sidebar {
+    flex: 0 0 280px; /* Fixed width for sidebar */
+    background-color: var(--light-color);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    height: fit-content; /* Adjust height to content */
+  }
+
+  .instructions-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .instructions-sidebar ul {
+    padding-left: 20px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.875rem; /* Slightly smaller font for sidebar */
+  }
+  .instructions-sidebar ul li {
+    margin-bottom: 8px;
+  }
+
+  .inventory-main-content {
+    flex: 1; /* Takes remaining space */
+  }
+
+  .inventory-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden; /* Ensures border-radius is applied to table corners */
+    box-shadow: var(--box-shadow-sm);
+    border: 1px solid var(--border-color); /* Add a subtle border to the table itself */
   }
-  thead tr {
-    background-color: #f7f7f7;
-    border-bottom: 2px solid #ddd;
+
+  .inventory-table thead tr {
+    background-color: var(--light-color); /* Lighter header background */
+    border-bottom: 2px solid var(--border-color);
   }
-  th, td {
+
+  .inventory-table th {
     text-align: left;
     padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
+    font-weight: 600; /* Bolder headers */
+    color: var(--dark-color);
+    text-transform: uppercase; /* Uppercase headers */
+    font-size: 0.85rem; /* Slightly smaller th text */
+    letter-spacing: 0.5px;
   }
-  tbody tr:hover {
-    background-color: #f0f8ff;
+
+  .inventory-table td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    color: var(--text-color);
   }
-  a {
-    color: #007bff;
+  
+  .inventory-table tbody tr:last-child td {
+    border-bottom: none; /* Remove border from last row */
+  }
+
+  .inventory-table tbody tr:hover {
+    background-color: #eef6ff; /* Softer hover color */
+  }
+
+  .inventory-table td a {
+    color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: 500;
   }
-  a:hover {
+  .inventory-table td a:hover {
     text-decoration: underline;
-    color: #0056b3;
+    color: var(--primary-hover-color);
   }
-  .admin-actions {
+  
+  .status-low {
+    color: #fd7e14; /* Orange for warning */
+    font-weight: 500;
+  }
+  .status-out {
+    color: var(--danger-color);
+    font-weight: 500;
+  }
+  .status-in {
+    color: var(--success-color); /* Green for in stock */
+  }
+
+  .admin-actions-panel {
     margin-top: 25px;
+    padding: 20px;
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
   }
-  .admin-actions h3 {
-    margin-bottom: 10px;
-    color: #222;
-  }
-  .btn-add {
-    display: inline-block;
-    padding: 10px 16px;
-    background-color: #28a745;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
+  .admin-actions-panel h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--dark-color);
     font-weight: 600;
-    transition: background-color 0.3s ease;
   }
-  .btn-add:hover {
-    background-color: #1e7e34;
+  .admin-actions-panel .btn {
+    margin-right: 10px;
   }
 </style>
 
-<div class="layout">
-  <!-- Sidebar Instructions -->
-  <div class="instructions">
-    <h3>Instructions</h3>
+<div class="inventory-layout">
+  <aside class="instructions-sidebar">
+    <h3>Quick Guide</h3>
     <ul>
-      <li>Only <strong>admin</strong> can add, edit, or delete items.</li>
-      <li>Other users have <strong>view-only</strong> access.</li>
-      <li>Permissions can be granted by admin.</li>
-      <li>Please log in to access full features.</li>
+      <li><strong>Admin:</strong> Full access to add, edit, delete items, and manage users.</li>
+      <li><strong>Users:</strong> View-only access to inventory details.</li>
+      <li>Item quantities are updated in real-time.</li>
+      <li>Low stock items are highlighted for attention.</li>
     </ul>
-  </div>
+  </aside>
 
-  <!-- Inventory Content -->
-  <div class="inventory-section">
-    <h2>Inventory</h2>
-    <table>
+  <div class="inventory-main-content">
+    <div class="page-header">
+        <h2 class="page-title">Current Inventory</h2>
+        {% if user and (user.username == "admin" or user.nickname == "admin") %}
+            <a href="/add" class="btn btn-success">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 5px;">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+                </svg>Add New Item
+            </a>
+        {% endif %}
+    </div>
+
+    <table class="inventory-table">
       <thead>
         <tr>
           <th>Name</th>
           <th>Price</th>
           <th>Quantity</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
-        {% for item in items %}
-        <tr>
-          <td><a href="/item/{{ item.id }}">{{ item.name }}</a></td>
-          <td>${{ item.price }}</td>
-          <td>
-            {% if item.quantity < 5 and item.quantity > 0 %}
-              <span style="color: red;">⚠️ Low Stock</span>
-            {% elif item.quantity == 0 %}
-              <span style="color: red;">❌ Out of Stock</span>
-            {% else %}
-              <span>In stock</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
+        {% if items %}
+          {% for item in items %}
+          <tr>
+            <td><a href="/item/{{ item.id }}">{{ item.name }}</a></td>
+            <td>${{ "%.2f"|format(item.price) }}</td> <td>{{ item.quantity }}</td>
+            <td>
+              {% if item.quantity == 0 %}
+                <span class="status-out">❌ Out of Stock</span>
+              {% elif item.quantity < 5 %}
+                <span class="status-low">⚠️ Low Stock</span>
+              {% else %}
+                <span class="status-in">✔️ In Stock</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px; color: var(--text-muted);">No items currently in inventory.</td>
+            </tr>
+        {% endif %}
       </tbody>
     </table>
 
     {% if user and (user.username == "admin" or user.nickname == "admin") %}
-  <div class="admin-actions">
-      <h3>Admin Actions</h3>
-      <a href="/add" class="btn-add">Add New Item</a>
-      <a href="/grant_access" class="btn-add">Manage User Access</a>
+    <div class="admin-actions-panel mt-4">
+      <h3>Admin Tools</h3>
+      <a href="/grant_access" class="btn btn-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 5px;">
+            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+        </svg>Manage User Access
+    </a>
     </div>
     {% endif %}
   </div>

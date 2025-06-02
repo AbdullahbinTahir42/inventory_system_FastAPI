@@ -1,64 +1,130 @@
 {% extends "main.html" %}
 {% block content %}
-
 <style>
-  .top-bar {
+  .access-control-container {
+    max-width: 750px; /* Wider for better layout */
+    margin: 20px auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+  }
+  .page-header-flex { /* For title and back button */
     display: flex;
-    justify-content: flex-start;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem; /* 24px */
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
   }
-  .back-button {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
+  .page-header-flex h2 { /* Overriding global page-title style for left alignment */
+    text-align: left;
+    margin-bottom: 0; /* Reset margin as it's handled by page-header */
   }
+
   .user-list {
-    max-width: 600px;
-    margin: auto;
+    margin-top: 1.5rem; /* Spacing after header/title area */
   }
+
   .user-row {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    padding: 12px 15px; /* Padding inside each row */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 12px; /* Space between user rows */
+    background-color: #fff; /* White background for each row */
+    transition: box-shadow 0.2s ease-in-out;
   }
-  .user-row input {
-    flex: 1;
-    padding: 8px;
-    margin-right: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+  .user-row:hover {
+    box-shadow: var(--box-shadow-sm);
   }
-  .grant-button {
-    padding: 8px 16px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
+
+  .user-info {
+    flex-grow: 1;
+    margin-right: 15px;
+  }
+  .user-info .username {
+    font-weight: 500;
+    color: var(--dark-color);
+    font-size: 1rem;
+  }
+  .user-info .role-indicator {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: block; /* On new line or use margin */
+  }
+  .user-info .role-admin {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .user-row .btn {
+    min-width: 120px; /* Ensure buttons have a nice width */
+    padding: 0.4rem 0.8rem; /* Slightly smaller buttons */
+  }
+  .btn-grant {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: #fff;
+  }
+  .btn-grant:hover {
+    background-color: var(--success-hover-color);
+    border-color: var(--success-hover-color);
+  }
+  .btn-remove {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: #fff;
+  }
+  .btn-remove:hover {
+    background-color: var(--danger-hover-color);
+    border-color: var(--danger-hover-color);
+  }
+  .btn-disabled { /* For current admin user */
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: #fff;
+    opacity: 0.65;
+    cursor: not-allowed;
   }
 </style>
 
-<div class="top-bar">
-  <a href="/" class="back-button">← Back to Home</a>
-</div>
+<div class="access-control-container">
+  <div class="page-header-flex">
+    <h2 class="page-title mb-0">User Access Control</h2>
+    <a href="/" class="btn btn-outline-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16" style="vertical-align: -0.125em; margin-right: 3px;">
+            <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
+        </svg>Back to Home
+    </a>
+  </div>
 
-<div class="user-list">
-  <h2>User Access Control</h2>
-
-  {% for user in users %}
-  <form method="post" action="" class="user-row">
-    <input type="text" name="username" value="{{ user.username }}" readonly>
-    {% if user.nickname != "admin"  %}
-    <button type="submit" class="grant-button">Grant</button>
+  <div class="user-list">
+    {% if users %}
+      {% for user_obj in users %} <form method="post" action="" class="user-row">
+        <input type="hidden" name="username" value="{{ user_obj.username }}">
+        <div class="user-info">
+          <span class="username">{{ user_obj.username }}</span>
+          {% if user_obj.nickname == "admin" %}
+            <span class="role-indicator role-admin">(Administrator)</span>
+          {% else %}
+            <span class="role-indicator">(Standard User)</span>
+          {% endif %}
+        </div>
+        
+        {% if user_obj.username == request.cookies.get("user") and user_obj.nickname == "admin" %} <button type="button" class="btn btn-disabled" disabled>Cannot Modify Self</button>
+        {% elif user_obj.nickname == "admin" %}
+          <button type="submit" name="action" value="remove_admin" class="btn btn-remove">Remove Admin</button>
+        {% else %}
+          <button type="submit" name="action" value="grant_admin" class="btn btn-grant">Grant Admin</button>
+        {% endif %}
+      </form>
+      {% endfor %}
     {% else %}
-    <button type="submit" class="grant-button">Remove</button>
+      <p class="text-center text-muted">No users found to manage.</p>
     {% endif %}
-  </form>
-  {% endfor %}
+  </div>
 </div>
-
 {% endblock %}
