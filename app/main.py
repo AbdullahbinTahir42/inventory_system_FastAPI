@@ -56,9 +56,7 @@ def register_user(
     new_user = model.User(username=username, hashed_password=hash_password(password),email=email)
     db.add(new_user)
     db.commit()
-    response = RedirectResponse(url="/", status_code=303)
-    response.set_cookie("user", username)
-    return response
+    return RedirectResponse(url="/", status_code=303)
 
 @app.get("/login", response_class=HTMLResponse)
 def login_form(request: Request):
@@ -90,10 +88,12 @@ def home_ui(request: Request, db: Session = Depends(get_db)):
 
 @app.get("/item/{item_id}", response_class=HTMLResponse)
 def item_detail_ui(item_id: int, request: Request, db: Session = Depends(get_db)):
+    username = request.cookies.get("user")
+    user = db.query(model.User).filter(model.User.username == username).first()
     item = db.query(model.Item).filter(model.Item.id == item_id).first()
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
-    return templates.TemplateResponse("item.html", {"request": request, "item": item})
+    return templates.TemplateResponse("item.html", {"request": request, "item": item, "user": user})
 
 
 @app.get("/add", response_class=HTMLResponse)
