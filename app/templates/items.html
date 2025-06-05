@@ -186,7 +186,7 @@
       </tbody>
     </table>
 
-    {% if user and (user.username == "admin" or user.nickname == "admin") %}
+    {% if request.cookies.get("user") == "admin" %}
     <div class="admin-actions-panel mt-4">
       <h3>Admin Tools</h3>
       <a href="/grant_access" class="btn btn-secondary">
