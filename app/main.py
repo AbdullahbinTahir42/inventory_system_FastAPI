@@ -7,7 +7,7 @@ from database import SessionLocal, engine, Base
 from utils import hash_password, verify_password
 from pydantic import ValidationError
 
-Base.metadata.drop_all(bind=engine)
+
 Base.metadata.create_all(bind=engine)
 
 
