@@ -7,7 +7,10 @@ from database import SessionLocal, engine, Base
 from utils import hash_password, verify_password
 from pydantic import ValidationError
 
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
+
+
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -35,9 +38,14 @@ def logout():
 
 @app.get("/register", response_class=HTMLResponse)
 def register_form(request: Request, db: Session = Depends(get_db)):
-    if not is_admin(request, db):
+   
+    admin = db.query(model.User).filter(model.User.username == "admin").first()
+    if not admin:
+        return templates.TemplateResponse("register.html", {"request": request})
+    elif not is_admin(request, db):
         return RedirectResponse(url="/", status_code=303)
-    return templates.TemplateResponse("register.html", {"request": request})
+    else:
+        return templates.TemplateResponse("register.html", {"request": request, "error": "Admin already exists"})       
 
 @app.post("/register")
 def register_user(
@@ -46,8 +54,9 @@ def register_user(
     password: str = Form(...),
     email: str = Form(...),
     db: Session = Depends(get_db)
-):
-    if not is_admin(request, db):
+):  
+    user = db.query(model.User).filter(model.User.username == "admin").first()
+    if not is_admin(request, db) and user:
         return RedirectResponse(url="/", status_code=303)
 
     existing_user = db.query(model.User).filter(model.User.username == username).first()
